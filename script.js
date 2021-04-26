@@ -61,7 +61,10 @@ array.forEach(element => {
   }
 });
 
-body.splice(2, 0, createImage(brand, "Background"));
+body.splice(2, 0, {
+  type: "image",
+  images: [createImage(brand, "Background")],
+});
 
 const data = {
   slider,
