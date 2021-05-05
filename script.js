@@ -6,12 +6,25 @@ function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
-function createImage(brand, section) {
-  return {
-    imageSrc: `/images/brands/${brand}/${capitalize(section)}_Placeholder.jpg`,
-    caption: "Placeholder caption",
-    captionPos: "right",
-  };
+function createImage(brand, section, caption) {
+  let image = {};
+
+  if (caption) {
+    image = {
+      imageSrc: `/images/brands/${brand}/${capitalize(
+        section
+      )}_Placeholder.jpg`,
+      caption: "Placeholder caption",
+      captionPos: "right",
+    };
+  } else {
+    image = {
+      imageSrc: `/images/brands/${brand}/${capitalize(
+        section
+      )}_Placeholder.jpg`,
+    };
+  }
+  return image;
 }
 
 let brand = process.argv[2] || "[brand]";
@@ -30,8 +43,6 @@ let body = [{ type: "pageTitle", content: brand.toUpperCase() }];
 array.forEach(element => {
   if (element.name == "h3") {
     const text = $(element).text();
-    const image = createImage(brand, capitalize(text));
-    let images = [];
 
     if (text.toUpperCase() == "PRODUCTION") {
       body.push({ type: "invite" });
@@ -46,10 +57,14 @@ array.forEach(element => {
     });
 
     if (text.toUpperCase() == "STYLE") {
-      images = Array(4).fill(image, 0, 4);
+      let images = Array(4).fill(
+        createImage(brand, capitalize(text), false),
+        0,
+        4
+      );
       body.push({ type: "image", images });
     } else if (text.toUpperCase() == "HISTORY") {
-      images.push(image);
+      let images = [createImage(brand, capitalize(text), true)];
       body.push({ type: "image", images });
     }
 
@@ -63,7 +78,7 @@ array.forEach(element => {
 
 body.splice(2, 0, {
   type: "image",
-  images: [createImage(brand, "Background")],
+  images: [createImage(brand, "Background", true)],
 });
 
 const data = {
@@ -71,6 +86,6 @@ const data = {
   body,
 };
 
-fs.writeFileSync(`${fileName}.json`, JSON.stringify(data, null, 4));
+fs.writeFileSync(`${fileName}.json`, JSON.stringify(data, null, 2));
 
 console.log(`${fileName}.json file created`);
